@@ -11,9 +11,8 @@ import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
 
-# import plotly components
+# import plotly
 import plotly.express as px
-
 
 # import data handling packages
 import pandas as pd
@@ -36,22 +35,9 @@ df[df.general_cause.isnull()] = 'Miscellaneous'
 df = df[df.fire_year != 'Miscellaneous']
 df['fire_year'] = df.fire_year.astype(int)
 
-
+# prepare data for overview graph
 x = df.fire_year.unique()
 y = df.groupby('fire_year')['total_acres'].sum()
-
-
-
-
-
-
-lightning = df[df.general_cause == 'Smoking']
-x_lightning = lightning.fire_year.unique()
-y_lightning = lightning.groupby('fire_year')['total_acres'].sum()
-
-
-# load in stylesheet
-
 
 # initiate app
 app = dash.Dash(__name__)
@@ -61,12 +47,6 @@ colors = {
     'text': '#7FDBFF'
 }
 
-
-
-
-
-
-
 app.layout = html.Div(style={'backgroundColor': colors['background']}, children=[
     html.H1(
         children='Oregon Wildfire Dashboard',
@@ -75,7 +55,8 @@ app.layout = html.Div(style={'backgroundColor': colors['background']}, children=
             'color': colors['text']
         }
     ),
-
+    
+    # overview graph
     html.Div(children='A page for Oregon wildfire data visualization.', style={
         'textAlign': 'left',
         'color': colors['text']
@@ -106,19 +87,18 @@ app.layout = html.Div(style={'backgroundColor': colors['background']}, children=
             }
         }
     ),
-  
     
+    # general cause graph with range slider  
+    html.Div(id='dynamicBarSet',
+             className='dynamicBarSet',
+             children=[
+        
     dcc.Dropdown(
         id='cause_dropdown',
         options=[{'label': i, 'value': i} for i in df.general_cause.unique()],
         value='Lightning'
     ),
-        
-        
-    html.Div(id='dynamicBarSet',
-             className='dynamicBarSet',
-             children=[
-    
+               
     dcc.Graph(
         id='dynamic_graph',
     ),
@@ -143,11 +123,12 @@ app.layout = html.Div(style={'backgroundColor': colors['background']}, children=
             ]
     ),
     
-    
+    # pie charts
     html.Div(id='pieParent',
              className='pieParent',
              children=[
     
+    # first pie chart
     html.Div(id='divYear',
              className='year',
              children=[
@@ -163,6 +144,7 @@ app.layout = html.Div(style={'backgroundColor': colors['background']}, children=
             ]
     ),
     
+    # second pie chart
     html.Div(id='divCounty',
              className='county',
              children=[
@@ -178,7 +160,7 @@ app.layout = html.Div(style={'backgroundColor': colors['background']}, children=
             ]
     ),
 
-
+    # third pie chart
     html.Div(id='divRedundant',
              className='redundant',
              children=[
@@ -197,10 +179,6 @@ app.layout = html.Div(style={'backgroundColor': colors['background']}, children=
 ])
 
 
-
-
-
-
 # app callback for dynamic bar graph
 @app.callback(
     Output(component_id='dynamic_graph', component_property='figure'),
@@ -211,9 +189,6 @@ def update_output_div(cause, year):
     
     mask = (filtered_df.fire_year >= year[0]) & (filtered_df.fire_year <= year[1])
     filtered_df = filtered_df.loc[mask]
-
-
-    
     
     return {
             'data': [{'x': filtered_df.fire_year.unique(),
@@ -235,20 +210,12 @@ def update_output_div(cause, year):
     }
        
 
-
-
-
-
-
-
-
 # app callback for piechart by cause
 @app.callback(
     Output('piechartYear', 'figure'),
     [Input('piechartInput', 'value')])
 def update_piechart(year):
     piechart_df = df[df.fire_year == year]
-    
     
     piechart = px.pie(
                     data_frame=piechart_df,
@@ -263,21 +230,12 @@ def update_piechart(year):
     return piechart
 
 
-
-
-
-
-
-
-
-
 # app callback for pie chart by county
 @app.callback(
     Output('piechartCounty', 'figure'),
     [Input('piechartCountyInput', 'value')])
 def update_piechartCounty(year):
     piechart_df = df[df.fire_year == year]
-    
     
     piechartCounty = px.pie(
                     data_frame=piechart_df,
@@ -291,19 +249,12 @@ def update_piechartCounty(year):
     
     return piechartCounty
     
-
-
-
-
-
-
 # app callback for pie chart by county
 @app.callback(
     Output('piechartRedundant', 'figure'),
     [Input('piechartRedundantInput', 'value')])
 def update_piechartCause(cause):
     piechart_df = df[df.general_cause == cause]
-    
     
     piechartYear = px.pie(
                     data_frame=piechart_df,
@@ -318,27 +269,5 @@ def update_piechartCause(cause):
     return piechartYear
 
 
-
-
-
-
-
-
-
-
-
 if __name__ == '__main__':
     app.run_server(debug=True)
-
-
-
-
-
-
-
-
-
-
-
-
-
