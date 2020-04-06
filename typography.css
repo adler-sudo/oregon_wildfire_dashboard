@@ -1,0 +1,46 @@
+
+.pieParent{
+    position: relative;
+    display: flex;
+    text-align: center;
+    }
+
+
+
+.year {
+    width: 500px;
+    align: left;
+    position: relative;
+    border: 10px solid #111111;
+    }
+    
+
+.county{
+    width: 500px;
+    align: middle;
+    display: grid;
+    position: relative;
+    border: 10px solid #111111;
+    }
+    
+    
+.redundant{
+    width: 500px;
+    align: right;
+    position: relative;
+    border: 10px solid #111111;
+    }
+    
+    
+    
+.dynamicBarSet {
+    border-bottom: 50px solid #111111;
+    }
+    
+    
+    
+    
+#cause_dropdown {
+    border-left: 20px solid #111111;
+    width: 200px;
+    }
