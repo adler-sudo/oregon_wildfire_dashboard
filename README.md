@@ -6,5 +6,8 @@ Download the files and run:
 python app.py
 
 
-All data collected from Oregon Wildfire Database
+All wildfire data collected from Oregon Wildfire Database
 https://apps.odf.oregon.gov/divisions/protection/fire_protection/fires/firesreports.asp
+
+All weather data collected from National Centers for Environmental Information
+https://www.ncdc.noaa.gov/cdo-web/search;jsessionid=4D0E0D3F1AD03E1FCC55E67EAA0CE329
