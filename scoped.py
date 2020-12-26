@@ -28,7 +28,6 @@ engine = create_engine('sqlite:///fire.db')
 conn = engine.connect()
 metadata = MetaData()
 
-# TODO: create consistent color for fire cause across all plots
 
 # select geo table
 geo = Table('geo', metadata, autoload=True, autoload_with=engine)
@@ -37,6 +36,11 @@ recordsGeo = conn.execute(queryGeo).fetchall()
 dfGeo = pd.DataFrame(recordsGeo, columns=geo.columns.keys())
 dfGeo.drop(columns=['index'], inplace=True)
 dfGeo.dropna(subset=['total_acres'], inplace=True)
+
+# TODO: create consistent color for fire cause across all plots
+causes = dfGeo['general_cause'].unique()
+colors = plotly.colors.qualitative.Vivid
+color_map = {cause: colors[n] for n, cause in enumerate(causes)}
 
 # initialize plot
 fig = px.scatter()
@@ -87,6 +91,7 @@ def update_graph(selected_year):
                      x='longitude',
                      y='latitude',
                      color='general_cause',
+                     color_discrete_map=color_map,
                      size='total_acres',
                      height=1000,
                      width=1600)
