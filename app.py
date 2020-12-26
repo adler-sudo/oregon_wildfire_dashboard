@@ -31,25 +31,17 @@ engine = create_engine('sqlite:///fire.db')
 conn = engine.connect()
 metadata = MetaData()
 
-fires = Table('fires', metadata, autoload=True, autoload_with=engine)
 geo = Table('geo', metadata, autoload=True, autoload_with=engine)
 
-query = select([fires])
 queryGeo = select([geo])
 
-records = conn.execute(query).fetchall()
 recordsGeo = conn.execute(queryGeo).fetchall()
 
-df = pd.DataFrame(records, columns=fires.columns.keys())
 dfGeo = pd.DataFrame(recordsGeo, columns=geo.columns.keys())
 
-df.drop(columns=['index'], inplace=True)
 dfGeo.drop(columns=['index'], inplace=True)
 dfGeo.dropna(subset=['total_acres'], inplace=True)
 
-df[df.general_cause.isnull()] = 'Miscellaneous'
-df = df[df.fire_year != 'Miscellaneous']
-df['fire_year'] = df.fire_year.astype(int)
 
 # initiate app
 app = dash.Dash(__name__)
@@ -60,11 +52,11 @@ colors = {
 }
 
 # prepare components for stacked bar
-stacked_df = df
-causes = stacked_df.general_cause.unique()
+stacked_df = dfGeo
+causes = stacked_df['general_cause'].unique()
+plotColors = plotly.colors.qualitative.Vivid
 fire_years = stacked_df.fire_year.unique()
 graphs = []
-plotColors = plotly.colors.qualitative.Alphabet
 
 # create the total acres burned graph by general cause
 for i in range(len(causes)):

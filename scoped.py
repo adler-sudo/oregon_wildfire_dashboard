@@ -37,7 +37,7 @@ dfGeo = pd.DataFrame(recordsGeo, columns=geo.columns.keys())
 dfGeo.drop(columns=['index'], inplace=True)
 dfGeo.dropna(subset=['total_acres'], inplace=True)
 
-# TODO: create consistent color for fire cause across all plots
+# define explicit color map for each general cause
 causes = dfGeo['general_cause'].unique()
 colors = plotly.colors.qualitative.Vivid
 color_map = {cause: colors[n] for n, cause in enumerate(causes)}
