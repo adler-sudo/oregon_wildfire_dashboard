@@ -83,8 +83,17 @@ def update_graph(selected_year):
     filtered_df = dfGeo[dfGeo.fire_year == selected_year]
 
     # plot fires for selected year
-    fig = px.scatter(filtered_df, x='longitude', y='latitude', color='general_cause', size='total_acres')
-    fig.update_traces(marker_sizeref=filtered_df['total_acres'].max() / 20 ** 2)
+    fig = px.scatter(filtered_df,
+                     x='longitude',
+                     y='latitude',
+                     color='general_cause',
+                     size='total_acres',
+                     height=1000,
+                     width=1600)
+    fig.update_traces(marker_sizeref=dfGeo['total_acres'].max() / 200 ** 2,
+                      marker_sizemin=3)
+    fig.update_layout(yaxis_range=[41.75, 46.5],
+                      xaxis_range=[-124.75, -116.25])
     # add oregon boundary trace
     fig.add_trace(fig_poly.data[0])
 
