@@ -28,6 +28,8 @@ engine = create_engine('sqlite:///fire.db')
 conn = engine.connect()
 metadata = MetaData()
 
+# TODO: create consistent color for fire cause across all plots
+
 # select geo table
 geo = Table('geo', metadata, autoload=True, autoload_with=engine)
 queryGeo = select([geo])
@@ -36,6 +38,9 @@ dfGeo = pd.DataFrame(recordsGeo, columns=geo.columns.keys())
 dfGeo.drop(columns=['index'], inplace=True)
 dfGeo.dropna(subset=['total_acres'], inplace=True)
 
+# initialize plot
+fig = px.scatter()
+
 # state polygon preparation
 # make call to api for oregon coordinates
 response = requests.get("https://services2.arcgis.com/DEoxb4q3EJppiDKC/arcgis/rest/services/States_shapefile/FeatureServer/0/query?where=State_Name%20%3D%20'OREGON'&outFields=*&outSR=4326&f=json")
@@ -43,14 +48,12 @@ coords = response.json()['features'][0]['geometry']['rings'][0]
 poly = Polygon(coords)
 x, y = poly.exterior.xy
 
-# plot the polygon
-fig_poly = px.line(x=x, y=y)
+# plot the state polygon
+fig_poly = px.line(x=x, y=y, color_discrete_sequence=px.colors.qualitative.G10)
 
 # initiate app
 app = dash.Dash(__name__)
 
-# initial figure (may be able to delete this)
-fig = px.scatter(dfGeo, x='longitude', y='latitude', color='total_acres')
 
 # construct page layout
 app.layout = html.Div(
@@ -67,9 +70,6 @@ app.layout = html.Div(
             id='fire-geo-visualization',
             figure=fig
         ),
-        dcc.Graph(
-            figure=fig_poly
-        )
     ]
 )
 
@@ -78,9 +78,15 @@ app.layout = html.Div(
     Output('fire-geo-visualization', 'figure'),
     Input('year-slider', 'value'))
 def update_graph(selected_year):
+
+    # filter for selected year
     filtered_df = dfGeo[dfGeo.fire_year == selected_year]
 
-    fig = px.scatter(filtered_df, x='longitude', y='latitude', color='total_acres', size='total_acres')
+    # plot fires for selected year
+    fig = px.scatter(filtered_df, x='longitude', y='latitude', color='general_cause', size='total_acres')
+    fig.update_traces(marker_sizeref=filtered_df['total_acres'].max() / 20 ** 2)
+    # add oregon boundary trace
+    fig.add_trace(fig_poly.data[0])
 
     return fig
 
