@@ -38,13 +38,23 @@ x, y = poly.exterior.xy
 # prep oregon state polygon
 fig_poly = px.line(x=x, y=y, color_discrete_sequence=px.colors.qualitative.G10)
 
+# right now just set up to use single day from practice data since
+# primary database is so large
 df = pd.read_sql('SELECT * FROM practice', con=conn)
-fig = px.scatter(df, 'LONGITUDE', 'LATITUDE', color='PRCP')
+fig = px.scatter(df,
+                 'LONGITUDE',
+                 'LATITUDE',
+                 color='PRCP',
+                 size='PRCP',
+                 height=1000,
+                 width=1600)
 
 # add oregon trace to scatter plot
 fig.add_trace(fig_poly.data[0])
 
-
+# create a consistent view of the entire state of oregon
+fig.update_layout(yaxis_range=[41.75, 46.5],
+                  xaxis_range=[-124.75, -116.25])
 
 
 # initiate app
