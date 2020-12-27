@@ -38,6 +38,7 @@ dfGeo.drop(columns=['index'], inplace=True)
 dfGeo.dropna(subset=['total_acres'], inplace=True)
 
 # define explicit color map for each general cause
+# TODO: will want to define this as a global variable that can be used in each page
 causes = dfGeo['general_cause'].unique()
 colors = plotly.colors.qualitative.Vivid
 color_map = {cause: colors[n] for n, cause in enumerate(causes)}
@@ -95,8 +96,12 @@ def update_graph(selected_year):
                      size='total_acres',
                      height=1000,
                      width=1600)
+
+    # alter marker size to display ratio ref, but also represent each fire (ie small ones still represented)
     fig.update_traces(marker_sizeref=dfGeo['total_acres'].max() / 200 ** 2,
                       marker_sizemin=3)
+
+    # create a consistent view of the entire state of oregon
     fig.update_layout(yaxis_range=[41.75, 46.5],
                       xaxis_range=[-124.75, -116.25])
     # add oregon boundary trace
@@ -108,3 +113,9 @@ def update_graph(selected_year):
 
 if __name__ == '__main__':
     app.run_server(debug=True)
+
+# TODO: allow user to select their location of interest and display fires within a 50 mile radius
+# TODO: include weather and fire data in the same view. filter by 50 mile radius.
+
+
+
