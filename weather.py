@@ -11,6 +11,10 @@ from dash.dependencies import Output, Input
 import numpy as np
 import sqlite3
 
+# date modules
+from datetime import date
+import datetime
+
 
 # TODO: need to go in and switch this initial df/fig to come from weatherData
 # convert fire database to dataframe
@@ -39,7 +43,13 @@ con = sqlite3.connect("practiceWeather.db")
 query = 'SELECT NAME FROM practice ORDER BY NAME'
 locations = con.execute(query).fetchall()
 locations = [l for l, in locations]
+locations = list(set(locations))
 
+# extract dates list
+query = 'SELECT DATE FROM practice ORDER BY NAME'
+dates = con.execute(query).fetchall()
+dates = [d for d, in dates]
+dates = list(set(dates))
 
 # state polygon preparation
 # make call to api for oregon coordinates
@@ -53,7 +63,7 @@ fig_poly = px.line(x=x, y=y, color_discrete_sequence=px.colors.qualitative.G10)
 
 # right now just set up to use single day from practice data since
 # primary database is so large
-df = pd.read_sql('SELECT * FROM practice', con=con)
+df = pd.read_sql('SELECT * FROM practice', con=con, parse_dates=['DATE'])
 fig = px.scatter(df,
                  'LONGITUDE',
                  'LATITUDE',
@@ -89,6 +99,10 @@ app.layout = html.Div(
                 'overflow-y': 'scroll'
             }
         ),
+        dcc.DatePickerSingle(
+            id='datepicker-range',
+            date=date(2019, 12, 23)
+        ),
         dcc.Graph(
             id='weather-map',
             figure=fig
@@ -100,8 +114,9 @@ app.layout = html.Div(
 # will want this to eventually include locations within a given region
 @app.callback(
     Output('weather-map', 'figure'),
-    Input('location-dropdown', 'value'))
-def update_map(location):
+    [Input('location-dropdown', 'value'),
+     Input('datepicker-range', 'date')])
+def update_map(location, start_date):
 
 
     # TODO: come back to this later to make call within callback statement after thread location is ignored
@@ -110,6 +125,7 @@ def update_map(location):
     # filtered_df = pd.read_sql(query, con=conn)
 
     filtered_df = df[df.CITY.isin(location)]
+    filtered_df = df[df.DATE == start_date]
 
     fig = px.scatter(filtered_df,
                      'LONGITUDE',
