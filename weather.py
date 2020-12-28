@@ -99,9 +99,10 @@ app.layout = html.Div(
                 'overflow-y': 'scroll'
             }
         ),
-        dcc.DatePickerSingle(
+        dcc.DatePickerRange(
             id='datepicker-range',
-            date=date(2019, 12, 23)
+            start_date=date(2019, 12, 23),
+            end_date=date(2019, 12, 23)
         ),
         dcc.Graph(
             id='weather-map',
@@ -115,8 +116,9 @@ app.layout = html.Div(
 @app.callback(
     Output('weather-map', 'figure'),
     [Input('location-dropdown', 'value'),
-     Input('datepicker-range', 'date')])
-def update_map(location, start_date):
+     Input('datepicker-range', 'start_date'),
+     Input('datepicker-range', 'end_date')])
+def update_map(location, start_date, end_date):
 
 
     # TODO: come back to this later to make call within callback statement after thread location is ignored
@@ -124,13 +126,16 @@ def update_map(location, start_date):
     # query = 'SELECT o.SNOW, l.LONGITUDE, l.LATITUDE, l.ELEVATION, l.CITY FROM observations AS o JOIN locations AS l WHERE l.CITY IN (%s)' % locs
     # filtered_df = pd.read_sql(query, con=conn)
 
+    # TODO: we will really want this to be average over a period of time so will need to add end_date
     filtered_df = df[df.CITY.isin(location)]
-    filtered_df = df[df.DATE == start_date]
+    filtered_df = df[(df.DATE >= start_date) & (df.DATE <= end_date)]
+    for l in filtered_df.NAME.unique():
+        filtered_df.loc[filtered_df.NAME == l, 'PRCP'] = filtered_df.groupby('NAME')['PRCP'].mean()[l]
 
     fig = px.scatter(filtered_df,
                      'LONGITUDE',
                      'LATITUDE',
-                     color='SNOW',
+                     color='PRCP',
                      size='ELEVATION',
                      hover_name='CITY',
                      height=1000,
