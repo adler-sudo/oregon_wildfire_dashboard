@@ -126,12 +126,18 @@ def update_map(location, start_date, end_date):
     # query = 'SELECT o.SNOW, l.LONGITUDE, l.LATITUDE, l.ELEVATION, l.CITY FROM observations AS o JOIN locations AS l WHERE l.CITY IN (%s)' % locs
     # filtered_df = pd.read_sql(query, con=conn)
 
-    # TODO: we will really want this to be average over a period of time so will need to add end_date
+    # filter by selected locations
     filtered_df = df[df.CITY.isin(location)]
-    filtered_df = df[(df.DATE >= start_date) & (df.DATE <= end_date)]
+
+    # filter by selected date range
+    filtered_df = filtered_df[(filtered_df.DATE >= start_date) & (filtered_df.DATE <= end_date)]
+
+    # TODO: may need to look at speeding this up a bit (can i remove loop, can i be more efficient in slicing)
+    # average over date range
     for l in filtered_df.NAME.unique():
         filtered_df.loc[filtered_df.NAME == l, 'PRCP'] = filtered_df.groupby('NAME')['PRCP'].mean()[l]
 
+    # recreate figure
     fig = px.scatter(filtered_df,
                      'LONGITUDE',
                      'LATITUDE',
@@ -150,7 +156,6 @@ def update_map(location, start_date, end_date):
 
     return fig
 
-# TODO: add ability to select date to filter map
 
 
 # run app
