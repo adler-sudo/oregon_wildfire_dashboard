@@ -23,6 +23,12 @@ import json
 import requests
 from shapely.geometry import Polygon
 
+# import app
+from app import app
+
+
+
+
 # convert fire database to dataframe
 engine = create_engine('sqlite:///fire.db')
 conn = engine.connect()
@@ -56,12 +62,8 @@ x, y = poly.exterior.xy
 # plot the state polygon
 fig_poly = px.line(x=x, y=y, color_discrete_sequence=px.colors.qualitative.G10)
 
-# initiate app
-app = dash.Dash(__name__)
-
-
 # construct page layout
-app.layout = html.Div(
+layout = html.Div(
     children=[
         dcc.Link('go to weather', href='/weather'),
         dcc.Slider(

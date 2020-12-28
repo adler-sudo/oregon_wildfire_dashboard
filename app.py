@@ -44,7 +44,7 @@ dfGeo.dropna(subset=['total_acres'], inplace=True)
 
 
 # initiate app
-app = dash.Dash(__name__)
+app = dash.Dash(__name__, suppress_callback_exceptions=True)
 
 colors = {
     'background': '#483C32',
@@ -105,7 +105,7 @@ app.layout = html.Div(style={'backgroundColor': colors['background']},
                       children=[
                           dcc.Link('go to weather', href='/weather'),
                           html.Br(),
-                          dcc.Link('go to fire', href='/fire'),
+                          dcc.Link('go to fire', href='/scoped'),
                                 html.H1(
                                     children='Oregon Wildfire Dashboard',
                                     style={

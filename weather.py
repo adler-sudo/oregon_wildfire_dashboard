@@ -15,6 +15,10 @@ import sqlite3
 from datetime import date
 import datetime
 
+# import master app
+from app import app
+
+
 
 # TODO: need to go in and switch this initial df/fig to come from weatherData
 # convert fire database to dataframe
@@ -80,14 +84,10 @@ fig.add_trace(fig_poly.data[0])
 fig.update_layout(yaxis_range=[41.75, 46.5],
                   xaxis_range=[-124.75, -116.25])
 
-
-# initiate app
-app = dash.Dash(__name__)
-
-
-app.layout = html.Div(
+# define layout
+layout = html.Div(
     children=[
-        dcc.Link('go to fire', href='/fire'),
+        dcc.Link('go to fire', href='/scoped'),
         dcc.Dropdown(
             id='location-dropdown',
             options=[
