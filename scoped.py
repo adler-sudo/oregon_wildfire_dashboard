@@ -63,6 +63,7 @@ app = dash.Dash(__name__)
 # construct page layout
 app.layout = html.Div(
     children=[
+        dcc.Link('go to weather', href='/weather'),
         dcc.Slider(
             id='year-slider',
             min=dfGeo['fire_year'].min(),

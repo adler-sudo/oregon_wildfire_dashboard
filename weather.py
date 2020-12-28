@@ -87,6 +87,7 @@ app = dash.Dash(__name__)
 
 app.layout = html.Div(
     children=[
+        dcc.Link('go to fire', href='/fire'),
         dcc.Dropdown(
             id='location-dropdown',
             options=[

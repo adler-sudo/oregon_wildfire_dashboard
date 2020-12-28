@@ -103,6 +103,9 @@ countGraph.update_layout(barmode='stack',
 # set app layout
 app.layout = html.Div(style={'backgroundColor': colors['background']},
                       children=[
+                          dcc.Link('go to weather', href='/weather'),
+                          html.Br(),
+                          dcc.Link('go to fire', href='/fire'),
                                 html.H1(
                                     children='Oregon Wildfire Dashboard',
                                     style={
