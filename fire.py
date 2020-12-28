@@ -24,7 +24,7 @@ import requests
 from shapely.geometry import Polygon
 
 # import app
-from app import app
+from firesByYear import app
 
 
 
@@ -65,7 +65,6 @@ fig_poly = px.line(x=x, y=y, color_discrete_sequence=px.colors.qualitative.G10)
 # construct page layout
 layout = html.Div(
     children=[
-        dcc.Link('go to weather', href='/weather'),
         dcc.Slider(
             id='year-slider',
             min=dfGeo['fire_year'].min(),

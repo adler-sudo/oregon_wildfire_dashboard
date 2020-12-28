@@ -16,7 +16,7 @@ from datetime import date
 import datetime
 
 # import master app
-from app import app
+from firesByYear import app
 
 
 
@@ -87,7 +87,6 @@ fig.update_layout(yaxis_range=[41.75, 46.5],
 # define layout
 layout = html.Div(
     children=[
-        dcc.Link('go to fire', href='/scoped'),
         dcc.Dropdown(
             id='location-dropdown',
             options=[
