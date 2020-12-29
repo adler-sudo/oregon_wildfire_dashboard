@@ -113,9 +113,6 @@ def update_graph(selected_year):
 
 
 
-if __name__ == '__main__':
-    app.run_server(debug=True)
-
 # TODO: allow user to select their location of interest and display fires within a 50 mile radius
 # TODO: include weather and fire data in the same view. filter by 50 mile radius.
 

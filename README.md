@@ -21,6 +21,4 @@ NOTE: The weather database has a limit to the number of Station Years you can do
 Use the precipitationVisualization.py, quick_visual.py, weatherDataEDA.py, and temperature_visual.py scripts to begin looking at some geospatial data for your location of interest. Check out some of the plots in the plotly_charts and eda_charts to get some inspiration.
 
 # Running the app
-There are currently three separate applications located within the oregon wildfire dashboard. One for weather visualization: weather.py, one for fire map visualization, scoped.py, and one for visualization of stacked bar info on wildfires by year: app.py.
-Call python <desired app> from the command line, and the app will begin running in your browser using dash app services.
-Don't forget to install the required packages from the requirements.txt file.
+Run the app from the index.py file. This will provide links to each of the three applications.

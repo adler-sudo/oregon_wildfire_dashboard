@@ -158,10 +158,6 @@ def update_map(location, start_date, end_date):
 
 
 
-# run app
-if __name__ == '__main__':
-    app.run_server(debug=True)
-
 
 
 # TODO: what we will want to do is select and join where date = criteria

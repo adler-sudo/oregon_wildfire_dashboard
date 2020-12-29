@@ -8,7 +8,9 @@ import weather, fire, firesByYear
 
 app.layout = html.Div([
     dcc.Link('go to weather', href='/weather'),
+    html.Br(),
     dcc.Link('go to fire', href='/fire'),
+    html.Br(),
     dcc.Link('go to fireByYear', href='/fireByYear'),
     dcc.Location(id='url', refresh=False),
     html.Div(id='page-content')
