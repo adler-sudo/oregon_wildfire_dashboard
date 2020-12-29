@@ -74,8 +74,7 @@ fig_poly = px.line(x=x, y=y, color_discrete_sequence=px.colors.qualitative.G10)
 df = pd.read_sql('SELECT * FROM practice', con=con, parse_dates=['DATE'])
 
 # filling prcp na with 0 (may want to look at different method moving forward?) - could sway data
-mask = df.PRCP.isna()
-df.loc[mask, 'PRCP'] = 0
+df.fillna({'PRCP':0}, inplace=True)
 fig = px.scatter(df,
                  'LONGITUDE',
                  'LATITUDE',
