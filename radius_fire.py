@@ -91,9 +91,8 @@ layout = html.Div(
             options=[
                 {'label': l, 'value': l} for l in locations
             ],
-            value=None
+            value=locations[0]
         ),
-        html.P(id='coordinate-check'),
         dcc.Graph(
             id='radius-fire-geo-visualization',
             figure=fig
@@ -148,13 +147,6 @@ def update_graph(selected_year, location):
     return fig
 
 
-@app.callback(
-    Output('coordinate-check', 'children'),
-    Input('fire-radius-location-dropdown', 'value'))
-def display_coordinates(location):
-    latitude = locations_table.loc[locations_table.NAME == location]['LATITUDE'].iloc[0]
-    longitude = locations_table.loc[locations_table.NAME == location]['LONGITUDE'].iloc[0]
-    return (latitude, longitude)
 
 # TODO: allow user to select their location of interest and display fires within a 50 mile radius
 # TODO: include weather and fire data in the same view. filter by 50 mile radius.
