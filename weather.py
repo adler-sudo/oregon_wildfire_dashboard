@@ -78,7 +78,8 @@ min_prcp = df.PRCP.min()
 max_prcp = df.PRCP.max()
 fig = px.scatter(height=1000,
                  width=1600)
-fig.update_layout(plot_bgcolor='rgb(169, 169, 169)')
+fig.update_layout(plot_bgcolor='rgb(180, 180, 180)')
+fig.update_traces(marker=dict(line=dict(width=2, color='Black')))
 
 # add oregon trace to scatter plot
 fig.add_trace(fig_poly.data[0])
@@ -152,13 +153,16 @@ def update_map(location, start_date, end_date):
                      height=1000,
                      width=1600)
 
+    # add marker border
+    fig.update_traces(marker=dict(line=dict(width=2, color='Black')))
+
     # add trace of oregon
     fig.add_trace(fig_poly.data[0])
 
     # create a consistent view of the entire state of oregon
     fig.update_layout(yaxis_range=[41.75, 46.5],
                       xaxis_range=[-124.75, -116.25],
-                      plot_bgcolor='rgb(10, 10, 10)')
+                      plot_bgcolor='rgb(180, 180, 180)')
 
     return fig
 

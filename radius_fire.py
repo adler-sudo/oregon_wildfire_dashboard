@@ -65,7 +65,8 @@ color_map = {cause: colors[n] for n, cause in enumerate(causes)}
 # initialize plot
 fig = px.scatter(height=1000,
                  width=1600)
-fig.update_layout(plot_bgcolor='rgb(169, 169, 169)')
+fig.update_layout(plot_bgcolor='rgb(180, 180, 180)')
+fig.update_traces(marker=dict(line=dict(width=2, color='Black')))
 
 # state polygon preparation
 # make call to api for oregon coordinates
@@ -139,11 +140,14 @@ def update_graph(selected_year, location):
 
     # alter marker size to display ratio ref, but also represent each fire (ie small ones still represented)
     fig.update_traces(marker_sizeref=dfGeo['total_acres'].max() / 200 ** 2,
-                      marker_sizemin=3)
+                      marker_sizemin=3,
+                      marker=dict(line=dict(width=2, color='Black')))
 
     # create a consistent view of the entire state of oregon
     fig.update_layout(yaxis_range=[41.75, 46.5],
-                      xaxis_range=[-124.75, -116.25])
+                      xaxis_range=[-124.75, -116.25],
+                      plot_bgcolor='rgb(180, 180, 180)')
+
     # add oregon boundary trace
     fig.add_trace(fig_poly.data[0])
 
