@@ -24,7 +24,7 @@ import requests
 from shapely.geometry import Polygon
 
 # import app
-from firesByYear import app
+from app import app
 
 
 
