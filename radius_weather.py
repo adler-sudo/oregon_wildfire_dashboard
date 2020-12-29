@@ -75,14 +75,14 @@ df = pd.read_sql('SELECT * FROM practice', con=con, parse_dates=['DATE'])
 
 # filling prcp na with 0 (may want to look at different method moving forward?) - could sway data
 df.fillna({'PRCP':0}, inplace=True)
-fig = px.scatter(df,
-                 'LONGITUDE',
-                 'LATITUDE',
-                 color='PRCP',
-                 size='PRCP',
-                 hover_name='CITY',
-                 height=1000,
+
+# initiate scatter
+colorscale = 'ice_r'
+min_prcp = df.PRCP.min()
+max_prcp = df.PRCP.max()
+fig = px.scatter(height=1000,
                  width=1600)
+fig.update_layout(plot_bgcolor='rgb(169, 169, 169)')
 
 # add oregon trace to scatter plot
 fig.add_trace(fig_poly.data[0])
@@ -159,6 +159,8 @@ def update_map(location, start_date, end_date):
                          'LONGITUDE',
                          'LATITUDE',
                          color='PRCP',
+                         color_continuous_scale=colorscale,
+                         range_color=[min_prcp, max_prcp],
                          size='PRCP',
                          hover_name='CITY',
                          height=1000,
@@ -172,7 +174,8 @@ def update_map(location, start_date, end_date):
 
     # create a consistent view of the entire state of oregon
     fig.update_layout(yaxis_range=[41.75, 46.5],
-                      xaxis_range=[-124.75, -116.25])
+                      xaxis_range=[-124.75, -116.25],
+                      plot_bgcolor='rgb(169, 169, 169)')
 
     return fig
 
