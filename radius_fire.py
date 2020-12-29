@@ -110,6 +110,7 @@ def update_graph(selected_year, location):
     # filter for selected year
     filtered_df = dfGeo[dfGeo.fire_year == selected_year]
 
+    # TODO: consolidate this to one simple query call to the database
     # filter for location (1 degree is equal to about 69 miles
     latitude = locations_table.loc[locations_table.NAME == location]['LATITUDE'].iloc[0]
     longitude = locations_table.loc[locations_table.NAME == location]['LONGITUDE'].iloc[0]

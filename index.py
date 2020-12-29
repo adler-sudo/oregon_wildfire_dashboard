@@ -3,7 +3,7 @@ import dash_html_components as html
 from dash.dependencies import Input, Output
 
 from firesByYear import app
-import weather, fire, firesByYear, radius_fire
+import weather, fire, firesByYear, radius_fire, radius_weather
 
 
 app.layout = html.Div([
@@ -14,6 +14,8 @@ app.layout = html.Div([
     dcc.Link('go to fireByYear', href='/fireByYear'),
     html.Br(),
     dcc.Link('go to radius fire', href='/radius_fire'),
+    html.Br(),
+    dcc.Link('go to radius weather', href='/radius_weather'),
     dcc.Location(id='url', refresh=False),
     html.Div(id='page-content'),
 ])
@@ -30,6 +32,8 @@ def display_page(pathname):
         return firesByYear.layout
     elif pathname == '/radius_fire':
         return radius_fire.layout
+    elif pathname == '/radius_weather':
+        return radius_weather.layout
 
 if __name__ == '__main__':
     app.run_server(debug=True)
