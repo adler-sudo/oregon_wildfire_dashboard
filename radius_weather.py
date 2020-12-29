@@ -18,7 +18,8 @@ from datetime import datetime
 # import master app
 from firesByYear import app
 
-
+# import base_objects
+from base_objects import fig
 
 # TODO: need to go in and switch this initial df/fig to come from weatherData
 # convert fire database to dataframe
@@ -80,10 +81,7 @@ df.fillna({'PRCP':0}, inplace=True)
 colorscale = 'ice_r'
 min_prcp = df.PRCP.min()
 max_prcp = df.PRCP.max()
-fig = px.scatter(height=1000,
-                 width=1600)
-fig.update_layout(plot_bgcolor='rgb(180, 180, 180)')
-fig.update_traces(marker=dict(line=dict(width=2, color='Black')))
+fig = fig
 
 # add oregon trace to scatter plot
 fig.add_trace(fig_poly.data[0])

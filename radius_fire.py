@@ -29,6 +29,9 @@ import numpy as np
 # import master app
 from app import app
 
+# import base objects
+from base_objects import fig
+
 
 # grab locations from practice
 # TODO: will want to integrate all databases so we can make one connection
@@ -63,10 +66,7 @@ colors = plotly.colors.qualitative.Vivid
 color_map = {cause: colors[n] for n, cause in enumerate(causes)}
 
 # initialize plot
-fig = px.scatter(height=1000,
-                 width=1600)
-fig.update_layout(plot_bgcolor='rgb(180, 180, 180)')
-fig.update_traces(marker=dict(line=dict(width=2, color='Black')))
+fig = fig
 
 # state polygon preparation
 # make call to api for oregon coordinates
