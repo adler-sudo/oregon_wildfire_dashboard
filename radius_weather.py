@@ -27,8 +27,7 @@ con = sqlite3.connect("weatherData.db")
 # only bringing in portion of data since whole dataset is too large for pycharm right now
 query = 'SELECT o.NAME, o.DATE, o.PRCP, l.CITY, l.LATITUDE, l.LONGITUDE FROM observations AS o JOIN locations AS l ON o.NAME = l.CITY WHERE o.DATE > "1990-12-23"'
 df = pd.read_sql(query, con=con, parse_dates=['DATE'])
-locations_table = df.drop_duplicates(subset=['CITY'])
-locations = [l for l in locations_table.CITY]
+locations = [l for l in df.NAME.unique()]
 locations = list(set(locations))
 locations.sort()
 
@@ -99,11 +98,11 @@ def update_map(location, start_date, end_date):
 
     # TODO: may need to look at speeding this up a bit (can i remove loop, can i be more efficient in slicing)
     # average over date range
-    for l in locations_table.CITY.unique():
-        filtered_df.loc[filtered_df.CITY == l, 'PRCP'] = filtered_df.groupby('NAME')['PRCP'].mean()[l]
+    for l in filtered_df.NAME.unique():
+        filtered_df.loc[filtered_df.NAME == l, 'PRCP'] = filtered_df.groupby('NAME')['PRCP'].mean()[l]
 
-    latitude = locations_table.loc[locations_table.CITY == location, 'LATITUDE'].iloc[0]
-    longitude = locations_table.loc[locations_table.CITY == location, 'LONGITUDE'].iloc[0]
+    latitude = filtered_df.loc[filtered_df.NAME == location, 'LATITUDE'].iloc[0]
+    longitude = filtered_df.loc[filtered_df.CITY == location, 'LONGITUDE'].iloc[0]
     filtered_df = filtered_df.loc[(filtered_df.LATITUDE > latitude - 1) & (filtered_df.LATITUDE < latitude + 1)]
     filtered_df = filtered_df.loc[(filtered_df.LONGITUDE > longitude - 1) & (filtered_df.LONGITUDE < longitude + 1)]
 
