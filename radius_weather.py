@@ -21,44 +21,16 @@ from firesByYear import app
 # import base_objects
 from base_objects import fig
 
-# TODO: need to go in and switch this initial df/fig to come from weatherData
-# convert fire database to dataframe
-# sqlalcehmy method
-# engine = create_engine('sqlite:///practiceWeather.db')
-# conn = engine.connect()
-# metadata = MetaData()
 
 # sqlite3 method
-con = sqlite3.connect("practiceWeather.db")
+con = sqlite3.connect("weatherData.db")
 
-# select weather table
-# observations = select([Table('observations', metadata, autoload=True, autoload_with=engine)])
-# locations = select([Table('locations', metadata, autoload=True, autoload_with=engine)])
-# weatherQuery = observations.join(locations, observations.c.NAME == locations.c.name)
-# recordsGeo = conn.execute(weatherQuery).fetchall()
-#
-# dfGeo = pd.DataFrame(recordsGeo, columns=weather.columns.keys())
-# dfGeo.drop(columns=['index'], inplace=True)
-# dfGeo.dropna(subset=['total_acres'], inplace=True)
-
-# select locations table
-
-# TODO: need to switch this to come from weather data and pick a specific day
-# extract locations list
-engine = create_engine('sqlite:///practiceWeather.db')
-con = engine.connect()
-metadata = MetaData()
-query = 'SELECT NAME, LONGITUDE, LATITUDE FROM practice ORDER BY NAME'
-locations_table = pd.read_sql(query, con=con)
-locations = [l for l in locations_table.NAME]
+# only bringing in portion of data since whole dataset is too large for pycharm right now
+query = 'SELECT o.NAME, o.DATE, o.PRCP, l.CITY, l.LATITUDE, l.LONGITUDE, l.ELEVATION FROM observations AS o JOIN locations AS l ON o.NAME = l.CITY WHERE o.DATE > "1990-12-23"'
+df = pd.read_sql(query, con=con, parse_dates=['DATE'])
+locations = [l for l in df.CITY]
 locations = list(set(locations))
 locations.sort()
-
-# extract dates list
-query = 'SELECT DATE FROM practice ORDER BY NAME'
-dates = con.execute(query).fetchall()
-dates = [d for d, in dates]
-dates = list(set(dates))
 
 # state polygon preparation
 # make call to api for oregon coordinates
@@ -69,10 +41,6 @@ x, y = poly.exterior.xy
 
 # prep oregon state polygon
 fig_poly = px.line(x=x, y=y, color_discrete_sequence=px.colors.qualitative.G10)
-
-# right now just set up to use single day from practice data since
-# primary database is so large
-df = pd.read_sql('SELECT * FROM practice', con=con, parse_dates=['DATE'])
 
 # filling prcp na with 0 (may want to look at different method moving forward?) - could sway data
 df.fillna({'PRCP':0}, inplace=True)
@@ -122,21 +90,9 @@ layout = html.Div(
      Input('radius-weather-datepicker-range', 'end_date')])
 def update_map(location, start_date, end_date):
 
-
     # TODO: come back to this later to make call within callback statement after thread location is ignored
-    # locs = ', '.join('"' + l + '"' for l in location)
     # query = 'SELECT o.SNOW, l.LONGITUDE, l.LATITUDE, l.ELEVATION, l.CITY FROM observations AS o JOIN locations AS l WHERE l.CITY IN (%s)' % locs
     # filtered_df = pd.read_sql(query, con=conn)
-
-    # # filter by selected locations
-    # locations will actually be checked by latitude/longitude slice rather than location
-    # filtered_df = df.loc[df.CITY == location]
-
-    # # convert dates to datetime
-    # start_date = date(2019, 12, 23)
-    # end_date = date(2019, 12, 23)
-    # start_date = datetime.combine(start_date, datetime.min.time())
-    # end_date = datetime.combine(end_date, datetime.min.time())
 
     # filter by selected date range
     filtered_df = df.loc[(df.DATE >= start_date) & (df.DATE <= end_date), :]
@@ -146,8 +102,8 @@ def update_map(location, start_date, end_date):
     for l in filtered_df.NAME.unique():
         filtered_df.loc[filtered_df.NAME == l, 'PRCP'] = filtered_df.groupby('NAME')['PRCP'].mean()[l]
 
-    latitude = locations_table.loc[locations_table.NAME == location, 'LATITUDE'].iloc[0]
-    longitude = locations_table.loc[locations_table.NAME == location, 'LONGITUDE'].iloc[0]
+    latitude = filtered_df.loc[filtered_df.NAME == location, 'LATITUDE'].iloc[0]
+    longitude = filtered_df.loc[filtered_df.NAME == location, 'LONGITUDE'].iloc[0]
     filtered_df = filtered_df.loc[(filtered_df.LATITUDE > latitude - 1) & (filtered_df.LATITUDE < latitude + 1)]
     filtered_df = filtered_df.loc[(filtered_df.LONGITUDE > longitude - 1) & (filtered_df.LONGITUDE < longitude + 1)]
 

@@ -30,7 +30,7 @@ from base_objects import fig
 # metadata = MetaData()
 
 # sqlite3 method
-con = sqlite3.connect("practiceWeather.db")
+con = sqlite3.connect("weatherData.db")
 
 # select weather table
 # observations = select([Table('observations', metadata, autoload=True, autoload_with=engine)])
@@ -46,16 +46,18 @@ con = sqlite3.connect("practiceWeather.db")
 
 # TODO: need to switch this to come from weather data and pick a specific day
 # extract locations list
-query = 'SELECT NAME FROM practice ORDER BY NAME'
-locations = con.execute(query).fetchall()
-locations = [l for l, in locations]
+query = 'SELECT o.NAME, o.DATE, o.PRCP, l.CITY, l.LATITUDE, l.LONGITUDE, l.ELEVATION FROM observations AS o JOIN locations AS l ON o.NAME = l.CITY WHERE o.DATE > "1990-12-23"'
+df = pd.read_sql(query, con=con, parse_dates=['DATE'])
+locations = [l for l in df.CITY]
 locations = list(set(locations))
+locations.sort()
+
 
 # extract dates list
-query = 'SELECT DATE FROM practice ORDER BY NAME'
-dates = con.execute(query).fetchall()
-dates = [d for d, in dates]
-dates = list(set(dates))
+# query = 'SELECT DATE FROM practice ORDER BY NAME'
+# dates = con.execute(query).fetchall()
+# dates = [d for d, in dates]
+# dates = list(set(dates))
 
 # state polygon preparation
 # make call to api for oregon coordinates
@@ -66,10 +68,6 @@ x, y = poly.exterior.xy
 
 # prep oregon state polygon
 fig_poly = px.line(x=x, y=y, color_discrete_sequence=px.colors.qualitative.G10)
-
-# right now just set up to use single day from practice data since
-# primary database is so large
-df = pd.read_sql('SELECT * FROM practice', con=con, parse_dates=['DATE'])
 
 # filling prcp na with 0 (may want to look at different method moving forward?) - could sway data
 df.fillna({'PRCP':0}, inplace=True)
