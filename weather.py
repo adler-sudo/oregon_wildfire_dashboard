@@ -148,7 +148,8 @@ def update_map(location, start_date, end_date):
                      size='PRCP',
                      hover_name='CITY',
                      height=1000,
-                     width=1600)
+                     width=1600,
+                     render_mode='webgl')
 
     # add marker border
     fig.update_traces(marker=dict(line=dict(width=2, color='Black')))

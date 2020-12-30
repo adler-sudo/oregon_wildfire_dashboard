@@ -13,10 +13,9 @@ import sqlite3
 
 # date modules
 from datetime import date
-from datetime import datetime
 
 # import master app
-from firesByYear import app
+from app import app
 
 # import base_objects
 from base_objects import fig
@@ -26,9 +25,10 @@ from base_objects import fig
 con = sqlite3.connect("weatherData.db")
 
 # only bringing in portion of data since whole dataset is too large for pycharm right now
-query = 'SELECT o.NAME, o.DATE, o.PRCP, l.CITY, l.LATITUDE, l.LONGITUDE, l.ELEVATION FROM observations AS o JOIN locations AS l ON o.NAME = l.CITY WHERE o.DATE > "1990-12-23"'
+query = 'SELECT o.NAME, o.DATE, o.PRCP, l.CITY, l.LATITUDE, l.LONGITUDE FROM observations AS o JOIN locations AS l ON o.NAME = l.CITY WHERE o.DATE > "1990-12-23"'
 df = pd.read_sql(query, con=con, parse_dates=['DATE'])
-locations = [l for l in df.CITY]
+locations_table = df.drop_duplicates(subset=['CITY'])
+locations = [l for l in locations_table.CITY]
 locations = list(set(locations))
 locations.sort()
 
@@ -99,11 +99,11 @@ def update_map(location, start_date, end_date):
 
     # TODO: may need to look at speeding this up a bit (can i remove loop, can i be more efficient in slicing)
     # average over date range
-    for l in filtered_df.NAME.unique():
-        filtered_df.loc[filtered_df.NAME == l, 'PRCP'] = filtered_df.groupby('NAME')['PRCP'].mean()[l]
+    for l in locations_table.CITY.unique():
+        filtered_df.loc[filtered_df.CITY == l, 'PRCP'] = filtered_df.groupby('NAME')['PRCP'].mean()[l]
 
-    latitude = filtered_df.loc[filtered_df.NAME == location, 'LATITUDE'].iloc[0]
-    longitude = filtered_df.loc[filtered_df.NAME == location, 'LONGITUDE'].iloc[0]
+    latitude = locations_table.loc[locations_table.CITY == location, 'LATITUDE'].iloc[0]
+    longitude = locations_table.loc[locations_table.CITY == location, 'LONGITUDE'].iloc[0]
     filtered_df = filtered_df.loc[(filtered_df.LATITUDE > latitude - 1) & (filtered_df.LATITUDE < latitude + 1)]
     filtered_df = filtered_df.loc[(filtered_df.LONGITUDE > longitude - 1) & (filtered_df.LONGITUDE < longitude + 1)]
 
@@ -119,7 +119,8 @@ def update_map(location, start_date, end_date):
                          size='PRCP',
                          hover_name='CITY',
                          height=1000,
-                         width=1600)
+                         width=1600,
+                         render_mode='webgl')
     else:
         fig = px.scatter(height=1000,
                          width=1600)
