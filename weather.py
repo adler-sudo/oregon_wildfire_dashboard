@@ -22,42 +22,15 @@ from firesByYear import app
 from base_objects import fig
 
 
-# TODO: need to go in and switch this initial df/fig to come from weatherData
-# convert fire database to dataframe
-# sqlalcehmy method
-# engine = create_engine('sqlite:///practiceWeather.db')
-# conn = engine.connect()
-# metadata = MetaData()
-
 # sqlite3 method
 con = sqlite3.connect("weatherData.db")
 
-# select weather table
-# observations = select([Table('observations', metadata, autoload=True, autoload_with=engine)])
-# locations = select([Table('locations', metadata, autoload=True, autoload_with=engine)])
-# weatherQuery = observations.join(locations, observations.c.NAME == locations.c.name)
-# recordsGeo = conn.execute(weatherQuery).fetchall()
-#
-# dfGeo = pd.DataFrame(recordsGeo, columns=weather.columns.keys())
-# dfGeo.drop(columns=['index'], inplace=True)
-# dfGeo.dropna(subset=['total_acres'], inplace=True)
-
-# select locations table
-
-# TODO: need to switch this to come from weather data and pick a specific day
-# extract locations list
-query = 'SELECT o.NAME, o.DATE, o.PRCP, l.CITY, l.LATITUDE, l.LONGITUDE, l.ELEVATION FROM observations AS o JOIN locations AS l ON o.NAME = l.CITY WHERE o.DATE > "1990-12-23"'
-df = pd.read_sql(query, con=con, parse_dates=['DATE'])
-locations = [l for l in df.CITY]
+# get locations
+query = 'SELECT DISTINCT CITY FROM locations'
+locations_df = pd.read_sql(query, con=con) # may not need to read into dataframe here
+locations = [l for l in locations_df.CITY]
 locations = list(set(locations))
 locations.sort()
-
-
-# extract dates list
-# query = 'SELECT DATE FROM practice ORDER BY NAME'
-# dates = con.execute(query).fetchall()
-# dates = [d for d, in dates]
-# dates = list(set(dates))
 
 # state polygon preparation
 # make call to api for oregon coordinates
@@ -69,13 +42,10 @@ x, y = poly.exterior.xy
 # prep oregon state polygon
 fig_poly = px.line(x=x, y=y, color_discrete_sequence=px.colors.qualitative.G10)
 
-# filling prcp na with 0 (may want to look at different method moving forward?) - could sway data
-df.fillna({'PRCP':0}, inplace=True)
-
 # initiate plot
 colorscale = 'blues'
-min_prcp = df['PRCP'].min()
-max_prcp = df['PRCP'].max()
+min_prcp = 10
+max_prcp = 0
 fig = fig
 
 # add oregon trace to scatter plot
@@ -123,15 +93,22 @@ def update_map(location, start_date, end_date):
 
 
     # TODO: come back to this later to make call within callback statement after thread location is ignored
-    # locs = ', '.join('"' + l + '"' for l in location)
-    # query = 'SELECT o.SNOW, l.LONGITUDE, l.LATITUDE, l.ELEVATION, l.CITY FROM observations AS o JOIN locations AS l WHERE l.CITY IN (%s)' % locs
-    # filtered_df = pd.read_sql(query, con=conn)
+    # connect to database and pull data only within timeframe
+    con = sqlite3.connect("weatherData.db")
+    query = 'SELECT o.NAME, o.DATE, o.PRCP, l.CITY, l.LATITUDE, l.LONGITUDE, l.ELEVATION ' \
+            'FROM observations AS o ' \
+            'JOIN locations AS l ' \
+            'ON o.NAME = l.CITY ' \
+            'WHERE o.DATE >= ? AND o.DATE <= ?'
+
+    df = pd.read_sql(query, con=con, parse_dates=['DATE'], params=[start_date, end_date])
 
     # filter by selected locations
     filtered_df = df[df.CITY.isin(location)]
+    filtered_df.fillna({'PRCP': 0}, inplace=True)
 
-    # filter by selected date range
-    filtered_df = filtered_df[(filtered_df.DATE >= start_date) & (filtered_df.DATE <= end_date)]
+    # filter by selected date range (don't need now since date taken care of in the query)
+    # filtered_df = filtered_df[(filtered_df.DATE >= start_date) & (filtered_df.DATE <= end_date)]
 
     # TODO: may need to look at speeding this up a bit (can i remove loop, can i be more efficient in slicing)
     # average over date range
