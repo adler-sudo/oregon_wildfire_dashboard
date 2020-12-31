@@ -74,8 +74,8 @@ df.fillna({'PRCP':0}, inplace=True)
 
 # initiate plot
 colorscale = 'blues'
-min_prcp = df.groupby('NAME')['PRCP'].mean().min()
-max_prcp = df.groupby('NAME')['PRCP'].mean().max()
+min_prcp = df['PRCP'].min()
+max_prcp = df['PRCP'].max()
 fig = fig
 
 # add oregon trace to scatter plot
