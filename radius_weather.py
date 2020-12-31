@@ -25,10 +25,10 @@ from base_objects import fig
 con = sqlite3.connect("weatherData.db")
 
 # only bringing in portion of data since whole dataset is too large for pycharm right now
-query = 'SELECT o.NAME, o.DATE, o.PRCP, l.CITY, l.LATITUDE, l.LONGITUDE FROM observations AS o JOIN locations AS l ON o.NAME = l.CITY WHERE o.DATE > "1990-12-23"'
-df = pd.read_sql(query, con=con, parse_dates=['DATE'])
-locations = [l for l in df.NAME.unique()]
-locations = list(set(locations))
+query = 'SELECT DISTINCT CITY FROM locations'
+loc_exec = con.execute(query)
+loc_exec = loc_exec.fetchall()
+locations = [l for l, in loc_exec]
 locations.sort()
 
 # state polygon preparation
@@ -41,13 +41,10 @@ x, y = poly.exterior.xy
 # prep oregon state polygon
 fig_poly = px.line(x=x, y=y, color_discrete_sequence=px.colors.qualitative.G10)
 
-# filling prcp na with 0 (may want to look at different method moving forward?) - could sway data
-df.fillna({'PRCP':0}, inplace=True)
-
 # initiate scatter
 colorscale = 'ice_r'
-min_prcp = df['PRCP'].min()
-max_prcp = df['PRCP'].max()
+min_prcp = 0
+max_prcp = 10
 fig = fig
 
 # add oregon trace to scatter plot
@@ -84,27 +81,30 @@ layout = html.Div(
 # will want this to eventually include locations within a given region
 @app.callback(
     Output('radius-weather-map', 'figure'),
+    Output('radius-weather-location-dropdown', 'options'),
     [Input('radius-weather-location-dropdown', 'value'),
      Input('radius-weather-datepicker-range', 'start_date'),
      Input('radius-weather-datepicker-range', 'end_date')])
 def update_map(location, start_date, end_date):
 
-    # TODO: come back to this later to make call within callback statement after thread location is ignored
-    # query = 'SELECT o.SNOW, l.LONGITUDE, l.LATITUDE, l.ELEVATION, l.CITY FROM observations AS o JOIN locations AS l WHERE l.CITY IN (%s)' % locs
-    # filtered_df = pd.read_sql(query, con=conn)
+    # connect to database and pull data only within timeframe
+    con = sqlite3.connect("weatherData.db")
+    query = 'SELECT o.NAME, o.DATE, o.PRCP, l.CITY, l.LATITUDE, l.LONGITUDE, l.ELEVATION ' \
+            'FROM observations AS o ' \
+            'JOIN locations AS l ' \
+            'ON o.NAME = l.CITY ' \
+            'WHERE o.DATE >= ? AND o.DATE <= ?'
+    df = pd.read_sql(query, con=con, parse_dates=['DATE'], params=[start_date, end_date])
+    df.fillna({'PRCP': 0}, inplace=True)
 
-    # filter by selected date range
-    filtered_df = df.loc[(df.DATE >= start_date) & (df.DATE <= end_date), :]
-
-    # TODO: may need to look at speeding this up a bit (can i remove loop, can i be more efficient in slicing)
-    # average over date range
-    for l in filtered_df.NAME.unique():
-        filtered_df.loc[filtered_df.NAME == l, 'PRCP'] = filtered_df.groupby('NAME')['PRCP'].mean()[l]
-
-    latitude = filtered_df.loc[filtered_df.NAME == location, 'LATITUDE'].iloc[0]
-    longitude = filtered_df.loc[filtered_df.CITY == location, 'LONGITUDE'].iloc[0]
-    filtered_df = filtered_df.loc[(filtered_df.LATITUDE > latitude - 1) & (filtered_df.LATITUDE < latitude + 1)]
+    latitude = df.loc[df.CITY == location, 'LATITUDE'].iloc[0]
+    longitude = df.loc[df.CITY == location, 'LONGITUDE'].iloc[0]
+    filtered_df = df.loc[(df.LATITUDE > latitude - 1) & (df.LATITUDE < latitude + 1)]
     filtered_df = filtered_df.loc[(filtered_df.LONGITUDE > longitude - 1) & (filtered_df.LONGITUDE < longitude + 1)]
+
+    # average over date range
+    for l in filtered_df.CITY.unique():
+        filtered_df.loc[filtered_df.CITY == l, 'PRCP'] = filtered_df.groupby('CITY')['PRCP'].mean()[l]
 
     # recreate figure
     # check for empty dataframe
@@ -135,7 +135,12 @@ def update_map(location, start_date, end_date):
                       xaxis_range=[-124.75, -116.25],
                       plot_bgcolor='rgb(180, 180, 180)')
 
-    return fig
+    locations = df.CITY.unique()
+    locations.sort()
+    new_locations = [
+        {'label': l, 'value': l} for l in locations
+    ]
+    return fig, new_locations
 
 
 

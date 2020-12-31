@@ -27,9 +27,9 @@ con = sqlite3.connect("weatherData.db")
 
 # get locations
 query = 'SELECT DISTINCT CITY FROM locations'
-locations_df = pd.read_sql(query, con=con) # may not need to read into dataframe here
-locations = [l for l in locations_df.CITY]
-locations = list(set(locations))
+loc_exec = con.execute(query)
+loc_exec = loc_exec.fetchall()
+locations = [l for l, in loc_exec]
 locations.sort()
 
 # state polygon preparation
@@ -44,8 +44,8 @@ fig_poly = px.line(x=x, y=y, color_discrete_sequence=px.colors.qualitative.G10)
 
 # initiate plot
 colorscale = 'blues'
-min_prcp = 10
-max_prcp = 0
+min_prcp = 0
+max_prcp = 10
 fig = fig
 
 # add oregon trace to scatter plot
@@ -91,8 +91,6 @@ layout = html.Div(
      Input('datepicker-range', 'end_date')])
 def update_map(location, start_date, end_date):
 
-
-    # TODO: come back to this later to make call within callback statement after thread location is ignored
     # connect to database and pull data only within timeframe
     con = sqlite3.connect("weatherData.db")
     query = 'SELECT o.NAME, o.DATE, o.PRCP, l.CITY, l.LATITUDE, l.LONGITUDE, l.ELEVATION ' \
@@ -100,7 +98,6 @@ def update_map(location, start_date, end_date):
             'JOIN locations AS l ' \
             'ON o.NAME = l.CITY ' \
             'WHERE o.DATE >= ? AND o.DATE <= ?'
-
     df = pd.read_sql(query, con=con, parse_dates=['DATE'], params=[start_date, end_date])
 
     # filter by selected locations
