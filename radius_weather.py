@@ -18,7 +18,7 @@ from datetime import date
 from app import app
 
 # import base_objects
-from base_objects import fig
+from base_objects import fig, fig_poly
 
 
 # sqlite3 method
@@ -31,21 +31,13 @@ loc_exec = loc_exec.fetchall()
 locations = [l for l, in loc_exec]
 locations.sort()
 
-# state polygon preparation
-# make call to api for oregon coordinates
-response = requests.get("https://services2.arcgis.com/DEoxb4q3EJppiDKC/arcgis/rest/services/States_shapefile/FeatureServer/0/query?where=State_Name%20%3D%20'OREGON'&outFields=*&outSR=4326&f=json")
-coords = response.json()['features'][0]['geometry']['rings'][0]
-poly = Polygon(coords)
-x, y = poly.exterior.xy
-
-# prep oregon state polygon
-fig_poly = px.line(x=x, y=y, color_discrete_sequence=px.colors.qualitative.G10)
+# define types of analysis
+analysis_types = ['EVAP', 'PRCP', 'SNOW', 'TAVG', 'TMAX', 'TMIN']
 
 # initiate scatter
 colorscale = 'ice_r'
 min_prcp = 0
 max_prcp = 1.5
-fig = fig
 
 # add oregon trace to scatter plot
 fig.add_trace(fig_poly.data[0])
@@ -64,6 +56,13 @@ layout = html.Div(
             ],
             multi=False,
             value=locations[0],
+        ),
+        dcc.Dropdown(
+            id='analysis-type-selector',
+            options=[
+                {'label': a, 'value': a} for a in analysis_types
+            ],
+            value='PRCP'
         ),
         dcc.DatePickerRange(
             id='radius-weather-datepicker-range',
@@ -84,18 +83,20 @@ layout = html.Div(
     Output('radius-weather-location-dropdown', 'options'),
     [Input('radius-weather-location-dropdown', 'value'),
      Input('radius-weather-datepicker-range', 'start_date'),
-     Input('radius-weather-datepicker-range', 'end_date')])
-def update_map(location, start_date, end_date):
+     Input('radius-weather-datepicker-range', 'end_date'),
+     Input('analysis-type-selector', 'value')])
+def update_map(location, start_date, end_date, analysis_type):
 
     # connect to database and pull data only within timeframe
     con = sqlite3.connect("weatherData.db")
-    query = 'SELECT o.NAME, o.DATE, o.PRCP, l.CITY, l.LATITUDE, l.LONGITUDE, l.ELEVATION ' \
+    columns = ['o.NAME', 'o.DATE', analysis_type, 'l.CITY', 'l.LATITUDE', 'l.LONGITUDE']
+    query = 'SELECT %s ' \
             'FROM observations AS o ' \
             'JOIN locations AS l ' \
             'ON o.NAME = l.CITY ' \
-            'WHERE o.DATE >= ? AND o.DATE <= ?'
+            'WHERE o.DATE >= ? AND o.DATE <= ?' % ','.join(columns)
     df = pd.read_sql(query, con=con, parse_dates=['DATE'], params=[start_date, end_date])
-    df.fillna({'PRCP': 0}, inplace=True)
+    df.fillna({analysis_type: 0}, inplace=True)
 
     latitude = df.loc[df.CITY == location, 'LATITUDE'].iloc[0]
     longitude = df.loc[df.CITY == location, 'LONGITUDE'].iloc[0]
@@ -104,7 +105,10 @@ def update_map(location, start_date, end_date):
 
     # average over date range
     for l in filtered_df.CITY.unique():
-        filtered_df.loc[filtered_df.CITY == l, 'PRCP'] = filtered_df.groupby('CITY')['PRCP'].mean()[l]
+        filtered_df.loc[filtered_df.CITY == l, analysis_type] = filtered_df.groupby('CITY')[analysis_type].mean()[l]
+
+    # drop 0 rows
+    filtered_df = filtered_df.loc[filtered_df[analysis_type] != 0]
 
     # recreate figure
     # check for empty dataframe
@@ -112,7 +116,7 @@ def update_map(location, start_date, end_date):
         fig = px.scatter(filtered_df,
                          'LONGITUDE',
                          'LATITUDE',
-                         color='PRCP',
+                         color=analysis_type,
                          color_continuous_scale=colorscale,
                          range_color=[min_prcp, max_prcp],
                          hover_name='CITY',

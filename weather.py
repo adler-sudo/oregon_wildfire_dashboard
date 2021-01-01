@@ -85,7 +85,7 @@ def update_map(start_date, end_date, analysis_type):
 
     # connect to database and pull data only within timeframe
     con = sqlite3.connect("weatherData.db")
-    columns = ('o.NAME', 'o.DATE', 'o.' + analysis_type, 'l.CITY', 'l.LATITUDE', 'l.LONGITUDE')
+    columns = ('o.NAME', 'o.DATE', analysis_type, 'l.CITY', 'l.LATITUDE', 'l.LONGITUDE')
     query = 'SELECT %s ' \
             'FROM observations AS o ' \
             'JOIN locations AS l ' \
@@ -100,6 +100,9 @@ def update_map(start_date, end_date, analysis_type):
     # average over date range
     for l in filtered_df.CITY.unique():
         filtered_df.loc[filtered_df.CITY == l, analysis_type] = filtered_df.groupby('CITY')[analysis_type].mean()[l]
+
+    # drop 0 rows
+    filtered_df = filtered_df.loc[filtered_df[analysis_type] != 0]
 
     # recreate figure
     fig = px.scatter(filtered_df,
