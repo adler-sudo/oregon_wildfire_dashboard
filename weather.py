@@ -109,7 +109,7 @@ def update_map(start_date, end_date):
                       xaxis_range=[-124.75, -116.25],
                       plot_bgcolor='rgb(180, 180, 180)')
 
-    summary = 'Precipitation from {} to {}'.format(start_date, end_date)
+    summary = ''
 
     return summary, fig
 

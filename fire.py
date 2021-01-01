@@ -105,7 +105,7 @@ def update_graph(selected_year):
     # alter marker size to display ratio ref, but also represent each fire (ie small ones still represented)
     fig.update_traces(marker_sizeref=dfGeo['total_acres'].max() / 200 ** 2,
                       marker_sizemin=3,
-                      marker=dict(line=dict(width=2, color='Black')))
+                      marker=dict(line=dict(width=1, color='Black')))
 
     # create a consistent view of the entire state of oregon
     fig.update_layout(yaxis_range=[41.75, 46.5],
