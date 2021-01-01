@@ -76,8 +76,8 @@ layout = html.Div(
 # location-specific map
 # will want this to eventually include locations within a given region
 @app.callback(
-    Output('loading-output-1', 'children'),
     Output('weather-map', 'figure'),
+    Output('loading-output-1', 'children'),
     [Input('datepicker-range', 'start_date'),
      Input('datepicker-range', 'end_date'),
      Input('analysis-type-selector', 'value')])
@@ -129,7 +129,7 @@ def update_map(start_date, end_date, analysis_type):
 
     summary = ''
 
-    return summary, fig
+    return fig, summary
 
 
 

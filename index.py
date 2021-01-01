@@ -7,6 +7,12 @@ import weather, fire, firesByYear, radius_fire, radius_weather
 
 
 app.layout = html.Div([
+    html.Div(id='header-div',
+             children=[
+                 html.H1('Oregon Wildfire Dashboard'),
+                 html.H3('An AI application for Oregon Wildfire Prediction and Prevention')
+                 ]
+             ),
     dcc.Tabs(id='tabs',
              value='tab-1',
              children=[

@@ -64,6 +64,11 @@ layout = html.Div(
             ],
             value='PRCP'
         ),
+        dcc.Loading(
+            id='loading-2',
+            type='default',
+            children=html.Div(id='loading-output-2')
+        ),
         dcc.DatePickerRange(
             id='radius-weather-datepicker-range',
             start_date=date(2019, 12, 23),
@@ -81,6 +86,7 @@ layout = html.Div(
 @app.callback(
     Output('radius-weather-map', 'figure'),
     Output('radius-weather-location-dropdown', 'options'),
+    Output('loading-output-2', 'children'),
     [Input('radius-weather-location-dropdown', 'value'),
      Input('radius-weather-datepicker-range', 'start_date'),
      Input('radius-weather-datepicker-range', 'end_date'),
@@ -143,7 +149,11 @@ def update_map(location, start_date, end_date, analysis_type):
     new_locations = [
         {'label': l, 'value': l} for l in locations
     ]
-    return fig, new_locations
+
+    # loading animation
+    summary = ''
+
+    return fig, new_locations, summary
 
 
 
