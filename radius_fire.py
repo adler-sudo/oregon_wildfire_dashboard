@@ -30,7 +30,7 @@ import numpy as np
 from app import app
 
 # import base objects
-from base_objects import fig
+from base_objects import fig, fig_poly
 
 
 # grab locations from practice
@@ -44,12 +44,10 @@ locations = [l for l in locations_table.NAME]
 locations = list(set(locations))
 locations.sort()
 
-
 # convert fire database to dataframe
 engine = create_engine('sqlite:///fire.db')
 conn = engine.connect()
 metadata = MetaData()
-
 
 # select geo table
 geo = Table('geo', metadata, autoload=True, autoload_with=engine)
@@ -60,23 +58,9 @@ dfGeo.drop(columns=['index'], inplace=True)
 dfGeo.dropna(subset=['total_acres'], inplace=True)
 
 # define explicit color map for each general cause
-# TODO: will want to define this as a global variable that can be used in each page
 causes = dfGeo['general_cause'].unique()
 colors = plotly.colors.qualitative.Vivid
 color_map = {cause: colors[n] for n, cause in enumerate(causes)}
-
-# initialize plot
-fig = fig
-
-# state polygon preparation
-# make call to api for oregon coordinates
-response = requests.get("https://services2.arcgis.com/DEoxb4q3EJppiDKC/arcgis/rest/services/States_shapefile/FeatureServer/0/query?where=State_Name%20%3D%20'OREGON'&outFields=*&outSR=4326&f=json")
-coords = response.json()['features'][0]['geometry']['rings'][0]
-poly = Polygon(coords)
-x, y = poly.exterior.xy
-
-# plot the state polygon
-fig_poly = px.line(x=x, y=y, color_discrete_sequence=px.colors.qualitative.G10)
 
 # construct page layout
 layout = html.Div(

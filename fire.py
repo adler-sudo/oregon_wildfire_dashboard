@@ -27,7 +27,7 @@ from shapely.geometry import Polygon
 from app import app
 
 # import base objects
-from base_objects import fig
+from base_objects import fig, fig_poly
 
 
 

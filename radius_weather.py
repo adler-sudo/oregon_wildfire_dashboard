@@ -44,7 +44,7 @@ fig_poly = px.line(x=x, y=y, color_discrete_sequence=px.colors.qualitative.G10)
 # initiate scatter
 colorscale = 'ice_r'
 min_prcp = 0
-max_prcp = 10
+max_prcp = 1.5
 fig = fig
 
 # add oregon trace to scatter plot
@@ -115,7 +115,6 @@ def update_map(location, start_date, end_date):
                          color='PRCP',
                          color_continuous_scale=colorscale,
                          range_color=[min_prcp, max_prcp],
-                         size='PRCP',
                          hover_name='CITY',
                          height=1000,
                          width=1600,
@@ -125,7 +124,7 @@ def update_map(location, start_date, end_date):
                          width=1600)
 
     # outline markers
-    fig.update_traces(marker=dict(line=dict(width=2, color='Black')))
+    fig.update_traces(marker=dict(line=dict(width=1, color='Black'), size=10))
 
     # add trace of oregon
     fig.add_trace(fig_poly.data[0])
