@@ -35,8 +35,13 @@ loc_exec = loc_exec.fetchall()
 locations = [l for l, in loc_exec]
 locations.sort()
 
+# define types of analysis
+analysis_types = ['EVAP', 'PRCP', 'SNOW', 'TAVG', 'TMAX', 'TMIN']
+
 # initiate plot
 colorscale = 'blues'
+
+# TODO: need to move these back to dynamic now that we have all weather data available
 min_prcp = 0
 max_prcp = 1.5
 
@@ -47,6 +52,13 @@ layout = html.Div(
             id='datepicker-range',
             start_date=date(2019, 12, 23),
             end_date=date(2019, 12, 23)
+        ),
+        dcc.Dropdown(
+            id='analysis-type-selector',
+            options=[
+                {'label': a, 'value': a} for a in analysis_types
+            ],
+            value='PRCP'
         ),
         dcc.Loading(
             id='loading-1',
@@ -67,30 +79,33 @@ layout = html.Div(
     Output('loading-output-1', 'children'),
     Output('weather-map', 'figure'),
     [Input('datepicker-range', 'start_date'),
-     Input('datepicker-range', 'end_date')])
-def update_map(start_date, end_date):
+     Input('datepicker-range', 'end_date'),
+     Input('analysis-type-selector', 'value')])
+def update_map(start_date, end_date, analysis_type):
 
     # connect to database and pull data only within timeframe
     con = sqlite3.connect("weatherData.db")
-    query = 'SELECT o.NAME, o.DATE, o.PRCP, l.CITY, l.LATITUDE, l.LONGITUDE, l.ELEVATION ' \
+    columns = ('o.NAME', 'o.DATE', 'o.' + analysis_type, 'l.CITY', 'l.LATITUDE', 'l.LONGITUDE')
+    query = 'SELECT %s ' \
             'FROM observations AS o ' \
             'JOIN locations AS l ' \
             'ON o.NAME = l.CITY ' \
-            'WHERE o.DATE >= ? AND o.DATE <= ?'
+            'WHERE o.DATE >= ? AND o.DATE <= ?' % ','.join(columns)
+
     filtered_df = pd.read_sql(query, con=con, parse_dates=['DATE'], params=[start_date, end_date])
 
     # filter by selected locations
-    filtered_df.fillna({'PRCP': 0}, inplace=True)
+    filtered_df.fillna({analysis_type: 0}, inplace=True)
 
     # average over date range
     for l in filtered_df.CITY.unique():
-        filtered_df.loc[filtered_df.CITY == l, 'PRCP'] = filtered_df.groupby('CITY')['PRCP'].mean()[l]
+        filtered_df.loc[filtered_df.CITY == l, analysis_type] = filtered_df.groupby('CITY')[analysis_type].mean()[l]
 
     # recreate figure
     fig = px.scatter(filtered_df,
                      'LONGITUDE',
                      'LATITUDE',
-                     color='PRCP',
+                     color=analysis_type,
                      color_continuous_scale=colorscale,
                      range_color=[min_prcp, max_prcp],
                      hover_name='CITY',
