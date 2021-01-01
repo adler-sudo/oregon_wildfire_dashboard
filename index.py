@@ -7,32 +7,30 @@ import weather, fire, firesByYear, radius_fire, radius_weather
 
 
 app.layout = html.Div([
-    dcc.Link('go to weather', href='/weather'),
-    html.Br(),
-    dcc.Link('go to fire', href='/fire'),
-    html.Br(),
-    dcc.Link('go to fireByYear', href='/fireByYear'),
-    html.Br(),
-    dcc.Link('go to radius fire', href='/radius_fire'),
-    html.Br(),
-    dcc.Link('go to radius weather', href='/radius_weather'),
-    dcc.Location(id='url', refresh=False),
-    html.Div(id='page-content'),
+    dcc.Tabs(id='tabs',
+             value='tab-1',
+             children=[
+                 dcc.Tab(label='fireByYear', value='tab-1'),
+                 dcc.Tab(label='fire', value='tab-2'),
+                 dcc.Tab(label='fire-radius', value='tab-3'),
+                 dcc.Tab(label='weather', value='tab-4'),
+                 dcc.Tab(label='weather-radius', value='tab-5')
+             ]),
+    html.Div(id='tab-driven-page-content')
 ])
 
-
-@app.callback(Output('page-content', 'children'),
-              Input('url', 'pathname'))
-def display_page(pathname):
-    if pathname == '/weather':
-        return weather.layout
-    elif pathname == '/fire':
-        return fire.layout
-    elif pathname == '/fireByYear':
+@app.callback(Output('tab-driven-page-content', 'children'),
+              Input('tabs', 'value'))
+def render_content(tab):
+    if tab == 'tab-1':
         return firesByYear.layout
-    elif pathname == '/radius_fire':
+    if tab == 'tab-2':
+        return fire.layout
+    if tab == 'tab-3':
         return radius_fire.layout
-    elif pathname == '/radius_weather':
+    if tab == 'tab-4':
+        return weather.layout
+    if tab == 'tab-5':
         return radius_weather.layout
 
 if __name__ == '__main__':
