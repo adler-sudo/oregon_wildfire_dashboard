@@ -28,7 +28,7 @@ from sqlalchemy import (create_engine,
 # import master app
 from app import app
 
-
+# TODO: go through and match this code to the other page methods
 
 # convert fire database to dataframe
 engine = create_engine('sqlite:///fire.db')

@@ -96,6 +96,8 @@ def update_map(location, start_date, end_date, analysis_type):
     # connect to database and pull data only within timeframe
     con = sqlite3.connect("weatherData.db")
     columns = ['o.NAME', 'o.DATE', analysis_type, 'l.CITY', 'l.LATITUDE', 'l.LONGITUDE']
+
+    # TODO: define data types when reading in dataframe (category, float16)
     query = 'SELECT %s ' \
             'FROM observations AS o ' \
             'JOIN locations AS l ' \
