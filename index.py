@@ -10,7 +10,7 @@ app.layout = html.Div([
     html.Div(id='header-div',
              children=[
                  html.H1('Oregon Wildfire Dashboard'),
-                 html.H3('An AI application for Oregon Wildfire Prediction and Prevention')
+                 html.H6('An AI application for Oregon wildfire prediction and prevention')
                  ]
              ),
     dcc.Tabs(id='tabs',

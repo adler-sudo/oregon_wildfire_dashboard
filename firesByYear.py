@@ -6,14 +6,11 @@ Created on Sat Apr  4 18:05:02 2020
 """
 
 # import dash packages
-import dash
 import dash_core_components as dcc
 import dash_html_components as html
-from dash.dependencies import Input, Output
 
 
 # import plotly
-import plotly.express as px
 import plotly.graph_objects as go
 import plotly
 

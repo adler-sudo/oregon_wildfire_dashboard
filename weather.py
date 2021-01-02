@@ -1,28 +1,18 @@
-from sqlalchemy import Table, MetaData, create_engine, select
 import pandas as pd
-from sqlalchemy.orm import sessionmaker
-import dash
 import dash_core_components as dcc
 import dash_html_components as html
 import plotly.express as px
-from shapely.geometry import Polygon
-import requests
 from dash.dependencies import Output, Input
-import numpy as np
 import sqlite3
 
 # date modules
 from datetime import date
-import datetime
 
 # import master app
 from firesByYear import app
 
 # import base objects
 from base_objects import fig, fig_poly
-
-# loading packages
-import time
 
 
 # sqlite3 method

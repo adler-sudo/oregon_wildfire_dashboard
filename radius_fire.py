@@ -1,5 +1,4 @@
 # import dash packages
-import dash
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
@@ -7,7 +6,6 @@ from dash.dependencies import Input, Output
 
 # import plotly
 import plotly.express as px
-import plotly.graph_objects as go
 import plotly
 
 
@@ -17,14 +15,6 @@ from sqlalchemy import (create_engine,
                         select,
                         Table,
                         MetaData)
-
-# modules needed for state polygon creation
-import json
-import requests
-from shapely.geometry import Polygon
-
-# location packages
-import numpy as np
 
 # import master app
 from app import app
