@@ -104,6 +104,7 @@ def update_graph(selected_year, location):
                          y='latitude',
                          color='general_cause',
                          color_discrete_map=color_map,
+                         hover_name='district',
                          size='total_acres',
                          height=1000,
                          width=1600)
