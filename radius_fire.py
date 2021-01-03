@@ -91,8 +91,8 @@ def update_graph(selected_year, location):
     # filter for location (1 degree is equal to about 69 miles
     latitude = locations_table.loc[locations_table.NAME == location]['LATITUDE'].iloc[0]
     longitude = locations_table.loc[locations_table.NAME == location]['LONGITUDE'].iloc[0]
-    filtered_df = filtered_df.loc[(filtered_df.latitude > latitude - 1) & (filtered_df.latitude < latitude + 1)]
-    filtered_df = filtered_df.loc[(filtered_df.longitude > longitude - 1) & (filtered_df.longitude < longitude + 1)]
+    filtered_df = filtered_df.loc[(filtered_df.latitude > latitude - 0.5) & (filtered_df.latitude < latitude + 0.5)]
+    filtered_df = filtered_df.loc[(filtered_df.longitude > longitude - 0.5) & (filtered_df.longitude < longitude + 0.5)]
 
     # check if criteria result in blank dataframe
     # may just want to define fix px scatter outside of if statement and add traces as necessary
