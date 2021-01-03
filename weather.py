@@ -85,7 +85,7 @@ def update_map(start_date, end_date, analysis_type):
     filtered_df = pd.read_sql(query, con=con, parse_dates=['DATE'], params=[start_date, end_date])
 
     # filter by selected locations
-    filtered_df.fillna({analysis_type: 0}, inplace=True)
+    filtered_df.dropna(inplace=True)
 
     # average over date range
     for l in filtered_df.CITY.unique():

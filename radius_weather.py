@@ -97,6 +97,8 @@ def update_map(location, start_date, end_date, analysis_type):
     con = sqlite3.connect("weatherData.db")
     columns = ['o.NAME', 'o.DATE', analysis_type, 'l.CITY', 'l.LATITUDE', 'l.LONGITUDE']
 
+    # TODO: move latitude and longitude before the primary query so that we can filter the query even further
+
     # TODO: define data types when reading in dataframe (category, float16)
     query = 'SELECT %s ' \
             'FROM observations AS o ' \
@@ -104,12 +106,12 @@ def update_map(location, start_date, end_date, analysis_type):
             'ON o.NAME = l.CITY ' \
             'WHERE o.DATE >= ? AND o.DATE <= ?' % ','.join(columns)
     df = pd.read_sql(query, con=con, parse_dates=['DATE'], params=[start_date, end_date])
-    df.fillna({analysis_type: 0}, inplace=True)
+    df.dropna(inplace=True)
 
     latitude = df.loc[df.CITY == location, 'LATITUDE'].iloc[0]
     longitude = df.loc[df.CITY == location, 'LONGITUDE'].iloc[0]
-    filtered_df = df.loc[(df.LATITUDE > latitude - 1) & (df.LATITUDE < latitude + 1)]
-    filtered_df = filtered_df.loc[(filtered_df.LONGITUDE > longitude - 1) & (filtered_df.LONGITUDE < longitude + 1)]
+    filtered_df = df.loc[(df.LATITUDE > latitude - 0.5) & (df.LATITUDE < latitude + 0.5)]
+    filtered_df = filtered_df.loc[(filtered_df.LONGITUDE > longitude - 0.5) & (filtered_df.LONGITUDE < longitude + 0.5)]
 
     # average over date range
     for l in filtered_df.CITY.unique():
@@ -117,6 +119,7 @@ def update_map(location, start_date, end_date, analysis_type):
 
     # drop 0 rows
     filtered_df = filtered_df.loc[filtered_df[analysis_type] != 0]
+    filtered_df.drop_duplicates(subset=['CITY'], inplace=True)
 
     # recreate figure
     # check for empty dataframe
