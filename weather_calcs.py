@@ -19,7 +19,9 @@ def weather_average(df, interest_variable, interest_date, day_range=30):
     return average
 
 
-def fire_count(df, interest_date, day_range=30):
+# TODO: move this to a different module
+# TODO: reduce the day range to 7?
+def fire_count(df, interest_date, day_range=7):
     """
     Parameters:
         df: dataframe of interest. dataframe comes from geo table in fire.db and must already be
@@ -57,6 +59,7 @@ def location_weather_df(location, analysis_type):
 
 
 # TODO: will be able to be smarter and consolidate the fire count and fire df dataframes
+# TODO: move this to a different module
 def location_fire_df(latitude, longitude):
     """
     returns dataframe of fires within 0.5 degrees of latitude and longitude
