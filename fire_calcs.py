@@ -3,8 +3,6 @@ import pandas as pd
 import datetime
 
 
-# TODO: move this to a different module
-# TODO: reduce the day range to 7?
 def fire_count(df, interest_date, day_range=7):
     """
     Parameters:
@@ -21,7 +19,6 @@ def fire_count(df, interest_date, day_range=7):
 
 
 # TODO: will be able to be smarter and consolidate the fire count and fire df dataframes
-# TODO: move this to a different module
 def location_fire_df(latitude, longitude):
     """
     returns dataframe of fires within 0.5 degrees of latitude and longitude
