@@ -42,7 +42,7 @@ def location_weather_df(location, analysis_type):
         location: must be exact location from fire database
         analysis_type: weather analysis type of interest (ie. PRCP, SNOW, etc.)
     """
-    weather_con = sqlite3.connect('weatherData.db')
+    weather_con = sqlite3.connect('../weatherData.db')
     columns = ['o.NAME', 'o.DATE', analysis_type, 'l.CITY', 'l.LATITUDE', 'l.LONGITUDE']
     weather_query = 'SELECT %s ' \
             'FROM observations AS o ' \
@@ -64,7 +64,7 @@ def location_fire_df(latitude, longitude):
     """
     returns dataframe of fires within 0.5 degrees of latitude and longitude
     """
-    fire_con = sqlite3.connect('fire.db')
+    fire_con = sqlite3.connect('../fire.db')
 
     # make this a count query in the future
     fire_query = 'SELECT * FROM geo WHERE latitude < ? + 0.5 AND latitude > ? - 0.5 AND longitude < ? + 0.5 AND longitude > ? - 0.5'
