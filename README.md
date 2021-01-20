@@ -2,8 +2,7 @@
 A dashboard for visualization of Oregon Wildfire Data from 1961-2019
 
 
-Download the files and run:
-python app.py
+
 
 
 All wildfire data collected from Oregon Wildfire Database
