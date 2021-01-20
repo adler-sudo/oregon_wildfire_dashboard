@@ -3,7 +3,7 @@ import dash_html_components as html
 from dash.dependencies import Input, Output
 
 from firesByYear import app
-import weather, fire, firesByYear, radius_fire, radius_weather
+import weather, fire, firesByYear, radius_fire, radius_weather, choropleth_experimental
 
 
 app.layout = html.Div([
@@ -20,7 +20,8 @@ app.layout = html.Div([
                  dcc.Tab(label='fire', value='tab-2'),
                  dcc.Tab(label='fire-radius', value='tab-3'),
                  dcc.Tab(label='weather', value='tab-4'),
-                 dcc.Tab(label='weather-radius', value='tab-5')
+                 dcc.Tab(label='weather-radius', value='tab-5'),
+                 dcc.Tab(label='choropleth-all', value='tab-6')
              ]),
     html.Div(id='tab-driven-page-content')
 ])
@@ -38,6 +39,8 @@ def render_content(tab):
         return weather.layout
     if tab == 'tab-5':
         return radius_weather.layout
+    if tab == 'tab-6':
+        return choropleth_experimental.layout
 
 if __name__ == '__main__':
     app.run_server(debug=True)
