@@ -23,12 +23,17 @@ df = df.loc[df.fips.str[:2] == '41']
 import plotly.express as px
 
 fig = px.choropleth(df, geojson=counties, locations='fips', color='unemp',
-                    color_continuous_scale="purples",
+                    color_continuous_scale="reds",
                     range_color=(0, 12),
-                    labels={'unemp': 'unemployment rate'}
+                    labels={'unemp': 'unemployment rate'},
+                    height=1000,
+                    width=1600,
                     )
 fig.update_geos(fitbounds='locations',
-                visible=False)
+                visible=False,
+                lataxis_range=[41.75,46.50],
+                lonaxis_range=[-124.75, -116.25],
+                )
 fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0})
 
 
