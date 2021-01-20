@@ -14,7 +14,7 @@ app.layout = html.Div([
                  ]
              ),
     dcc.Tabs(id='tabs',
-             value='tab-1',
+             value='tab-6',
              children=[
                  dcc.Tab(label='fireByYear', value='tab-1'),
                  dcc.Tab(label='fire', value='tab-2'),
