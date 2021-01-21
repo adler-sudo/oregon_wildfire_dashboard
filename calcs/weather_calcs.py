@@ -19,13 +19,13 @@ def weather_average(df, interest_variable, interest_date, day_range=30):
     return average
 
 
-def location_weather_df(location, analysis_type):
+def location_weather_df(location, analysis_type, db_file='weatherData.db'):
     """
     Parameters:
         location: must be exact location from fire database
         analysis_type: weather analysis type of interest (ie. PRCP, SNOW, etc.)
     """
-    weather_con = sqlite3.connect('../weatherData.db')
+    weather_con = sqlite3.connect(db_file)
     columns = ['o.NAME', 'o.DATE', analysis_type, 'l.CITY', 'l.LATITUDE', 'l.LONGITUDE']
     weather_query = 'SELECT %s ' \
             'FROM observations AS o ' \
