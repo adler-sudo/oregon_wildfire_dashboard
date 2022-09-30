@@ -22,7 +22,7 @@ geopandas @ file:///C:/Users/james/pipwin/geopandas-0.8.1-py3-none-any.whl
 idna==2.10
 itsdangerous==1.1.0
 Jinja2==2.11.2
-joblib==1.0.0
+joblib==1.2.0
 Js2Py==0.70
 kiwisolver==1.3.1
 MarkupSafe==1.1.1
